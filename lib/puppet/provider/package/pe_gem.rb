@@ -1,6 +1,6 @@
 require 'puppet/provider/package'
 require 'uri'
-
+require 'rubygems'
 # Ruby gems support.
 Puppet::Type.type(:package).provide :pe_gem, :parent => :gem do
   desc "Puppet Enterprise Ruby Gem support. If a URL is passed via `source`, then
@@ -10,6 +10,11 @@ Puppet::Type.type(:package).provide :pe_gem, :parent => :gem do
     repositories."
 
   has_feature :versionable, :install_options
+  # Test to ensure that we are using puppet enterprise
+  # While this might be useful for non-pe installs, we would have to rename this project
+  confine :true => begin
+    Facter[:puppetversion].value =~ /Enterprise/i
+  end
 
-  commands :gemcmd => "/opt/puppet/bin/gem"
+  commands :gemcmd => File.join(Gem.bindir,'gem')
 end
